@@ -25,7 +25,7 @@ type BasisSpline
    end
 end
 
-function PadKnots(B::BasisSpline, scheme::ASCIIString="repeat")
+function PadKnots(B::BasisSpline, scheme="repeat")
     if scheme == "reflect"
         for i = 1:(B.m - 1)
             B.t[i] = 2.0*B.t[B.m] - B.t[2*B.m - 1 - i]
@@ -219,7 +219,7 @@ function SplineEvalMatrixSparse(B::BasisSpline, x::Vector{Float64}, derivs::Int=
                 push!(MatCol, j + k - 1)
                 push!(MatVal, BasisEval(B, idxs[j + k - 1], x[i], derivs))
             end
-        end    
+        end
     end
 
     return sparse(MatRow, MatCol, MatVal, m, n_interior_knots)
@@ -234,7 +234,7 @@ type Spline{T}
     B::BasisSpline
     alpha::Vector{T}
 
-    Spline{T} (B::BasisSpline, alpha::Vector{T}) = new(B, alpha)
+    Spline(B::BasisSpline, alpha::Vector{T}) = new(B, alpha) where T
 end
 
 
@@ -254,7 +254,7 @@ function Spline{T}(v::Vector{T}, B::BasisSpline)
 end
 
 # Utility constructor
-function Spline{T}(v::Vector{T}, t::Vector{Float64}, m::Int=4) 
+function Spline{T}(v::Vector{T}, t::Vector{Float64}, m::Int=4)
     issorted(t) && return Spline(v, BasisSpline(t,m))
     # sort t and v
     π = sortperm(t)
