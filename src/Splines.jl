@@ -1,11 +1,12 @@
 module Splines
 export BasisSpline, Spline, BasisEval, SplineCoeffMatrix, SplineEvalMatrix, PadKnots
 
+import Base.-, Base.*, Base./, Base.+
 # TODO: implement more than zero BC
 
 
 # Definition of collection of basis splines
-type BasisSpline
+struct BasisSpline
     # The knot sequence vector on which this collection is to be defined
     t::Vector{Float64}
     # length of knot sequence
@@ -20,7 +21,7 @@ type BasisSpline
         #difft = diff(t)
         #t = t + 0.5*[ difft; difft[end]; ]
         n = length(t)
-        t_pad = [t[1] * ones(m-1); t; t[end]*ones(m-1)]
+        t_pad = [t[1] * ones(m-one(m)); t; t[end]*ones(m-one(m))]
         return new(t_pad, n, m)
    end
 end
@@ -60,7 +61,8 @@ end
 # return original knot sequence (unpadded)
 function knots(B::BasisSpline)
     n = size(B.t,1)
-    return sub(B.t, (B.m):n-B.m+1)
+    # return sub(B.t, (B.m):n-B.m+1)
+    return B.t[B.m+1:end] # thats a guess
 end
 
 
@@ -229,12 +231,12 @@ end
 
 
 # Definition of Interpolatory spline
-type Spline{T}
+struct Spline{T}
     # Function values sampled at the knot sequence
     B::BasisSpline
     alpha::Vector{T}
 
-    Spline(B::BasisSpline, alpha::Vector{T}) = new(B, alpha) where T
+    Spline{T}(B::BasisSpline, alpha::Vector{T}) where T = new(B, alpha)
 end
 
 
